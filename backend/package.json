@@ -1,0 +1,40 @@
+{
+  "name": "generador-consultas-sql",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand",
+    "test:coverage": "node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage --runInBand",
+    "start": "node ./src/index.js",
+    "dev": "nodemon ./src/index.js",
+    "lint": "eslint src",
+    "lint:fix": "eslint src --fix"
+  },
+  "type": "module",
+  "jest": {
+    "testEnvironment": "node"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@faker-js/faker": "^10.1.0",
+    "@google/generative-ai": "^0.24.1",
+    "axios": "^1.12.2",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.1",
+    "express": "^5.1.0",
+    "mysql2": "^3.15.3"
+  },
+  "devDependencies": {
+    "@eslint/compat": "^1.2.5",
+    "@eslint/css": "^0.11.0",
+    "@eslint/js": "^9.18.0",
+    "@eslint/json": "^0.13.2",
+    "eslint": "^9.18.0",
+    "globals": "^16.4.0",
+    "jest": "^30.2.0",
+    "nodemon": "^3.1.10"
+  }
+}

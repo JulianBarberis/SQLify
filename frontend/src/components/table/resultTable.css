@@ -1,0 +1,40 @@
+.table {
+  width: 100%;
+}
+
+.table-header {
+  padding-bottom: 2rem;
+}
+
+.data {
+  padding-bottom: 1rem;
+  text-align: center;
+}
+.data.play-container {
+  display: flex;
+  justify-content: center;
+}
+
+.play-button {
+  background-color: var(--color-primario);
+  border: none;
+  border-radius: 50%;
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+.play-button:hover {
+  background-color: var(--color-primario-hover);
+  transform: scale(1.1);
+}
+
+.icon {
+  width: 22px;
+  height: 22px;
+  fill: black;
+}
