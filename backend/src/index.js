@@ -2,28 +2,39 @@ import dotenv from 'dotenv'
 import express from 'express'
 import cors from 'cors'
 import { initPool, closePool } from './db/db.js'
-import { consultaController } from './controllers/consultaController.js'
-import { pingDb } from './controllers/pingDb.js'
+import apiRouter from './routes/api.routes.js'
 
 dotenv.config()
 const app = express()
 
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://localhost:5174',
+  'http://localhost:3000',
+  'http://158.69.212.87',
+  'http://158.69.212.87:5173',
+  'http://158.69.212.87:3000'
+]
+
 app.use(cors({
-  origin: [
-    'http://localhost:5173',         // para desarrollo local
-    'http://localhost:3000',
-    'http://158.69.212.87',         // IP pública del VPS
-    'http://158.69.212.87:5173',    // Front alojado en el VPS
-    'http://158.69.212.87:3000'     
-  ],
-  methods: ['GET', 'POST'],
-  allowedHeaders: ['Content-Type'],
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true)
+    if (/^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) {
+      return callback(null, true)
+    }
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true)
+    }
+    return callback(new Error(`Origen ${origin} no permitido por CORS`), false)
+  },
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: false,
   maxAge: 3600
 }))
 
 app.use(express.json())
-initPool()
+initPool().catch(err => console.warn('Aviso: Base de datos no conectada al inicio:', err.message || err))
 const PORT = process.env.PORT || 3001
 
 /* Puerto utilizado por el servidor en consola */
@@ -31,19 +42,15 @@ app.listen(PORT, () => {
   console.log(`Servidor escuchando en http://localhost:${PORT}`)
 })
 
-// Ruta de prueba
+// Rutas de la API bajo /api
+app.use('/api', apiRouter)
+
+// Ruta de prueba raíz y retrocompatibilidad
 app.get('/', (req, res) => {
   res.send({ message: 'Servidor Express para generador IA de consultas SQL 🚀' })
 })
-
-// Generar consulta
-app.post('/generar-consulta', consultaController)
-
-// Ping a la DB
-app.get('/db-ping', pingDb);
-
-// Cierre del pool al apagar el servidor
-['SIGINT', 'SIGTERM'].forEach(sig => {
+const signals = ['SIGINT', 'SIGTERM']
+signals.forEach(sig => {
   process.on(sig, async () => {
     console.log(`\nRecibí ${sig}, cerrando pool...`)
     await closePool()

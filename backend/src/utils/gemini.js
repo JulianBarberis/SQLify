@@ -3,14 +3,6 @@ import dotenv from 'dotenv'
 import { GoogleGenerativeAI } from '@google/generative-ai'
 
 dotenv.config()
-const apiKey = process.env.GEMINI_API_KEY
-
-if (!apiKey) {
-  console.error('Falta GEMINI_API_KEY en .env')
-  process.exit(1)
-}
-
-const genAI = new GoogleGenerativeAI(apiKey)
 
 /* Google cambio los modelos disponibles de gemini el 29/9 */
 /* Modelos disponibles 2.0 y 2.5, pro, flash, y flash-lite */
@@ -18,6 +10,12 @@ const genAI = new GoogleGenerativeAI(apiKey)
 /* Los modelos 2.x expiran en 2026, 2.0 flash en febrero, tenerlo en cuenta */
 
 export async function consultarGemini({ question, schemaDDL, limit }) {
+  const apiKey = process.env.GEMINI_API_KEY
+  if (!apiKey) {
+    throw new Error('Falta configurar GEMINI_API_KEY en las variables de entorno (.env).')
+  }
+
+  const genAI = new GoogleGenerativeAI(apiKey)
   const systemInstruction = `
     Eres un asistente que traduce preguntas a SQL en dialecto MariaDB 10.x.
     Reglas IMPORTANTES:
@@ -33,15 +31,8 @@ export async function consultarGemini({ question, schemaDDL, limit }) {
     - Evita ORDER BY dentro de subconsultas que también usen LIMIT, salvo que sea indispensable.
     - Usa funciones estándar (COUNT, MIN, MAX, AVG, SUM) en lugar de analíticas (OVER, RANK, etc).
     - Evita errores de sintaxis: no dejes paréntesis abiertos ni SELECTs flotantes.
-    `
-  let model
+    `.trim()
 
-  try {
-    model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash-lite', config: { systemInstruction } })
-  } catch(e) {
-    throw new Error(`Hubo un error al crear el modelo de Gemini: ${String(e)}`)
-  }
-  
   const userPrompt = `
     Esquema de la base (resumen tipo DDL):
 
@@ -51,20 +42,43 @@ export async function consultarGemini({ question, schemaDDL, limit }) {
     ${question}
 
     Responde SOLO la SQL.
-    `
-  try {
-    const result = await model.generateContent(userPrompt)
-    
-    // checkear
-    const text = result?.response?.text?.()
+    `.trim()
 
-    if (!text) {
-      throw new Error('La respuesta de Gemini está vacía o no contiene texto.')
+  const preferredModel = process.env.GEMINI_MODEL || 'gemini-3.5-flash-lite'
+  const candidateModels = [
+    preferredModel,
+    'gemini-3.5-flash-lite',
+    'gemini-3.6-flash',
+    'gemini-2.5-flash'
+  ].filter((m, i, arr) => arr.indexOf(m) === i)
+
+  let lastError = null
+
+  for (const modelName of candidateModels) {
+    try {
+      const model = genAI.getGenerativeModel({
+        model: modelName,
+        systemInstruction,
+        generationConfig: {
+          temperature: 0.0,
+          maxOutputTokens: 1000,
+        },
+      })
+
+      const result = await model.generateContent(userPrompt)
+      const text = result?.response?.text?.()
+
+      if (!text) {
+        throw new Error('La respuesta de Gemini está vacía.')
+      }
+
+      const sql = text.replace(/```sql|```/gi, '').replace(/\s+/g, ' ').replace(/\n/g, ' ').trim()
+      return sql
+    } catch (e) {
+      lastError = e
+      console.warn(`Aviso: Modelo Gemini ${modelName} falló:`, e.message || e)
     }
-
-    const sql = text.replace(/\s+/g, ' ').replace(/\n/g, ' ').trim()
-    return sql
-  } catch (e) {
-    throw new Error(`Hubo un error al enviar la consulta a Gemini: ${String(e)}`)
   }
+
+  throw new Error(`Hubo un error al enviar la consulta a Gemini: ${lastError ? (lastError.message || String(lastError)) : 'Error desconocido'}`)
 }
