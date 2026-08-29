@@ -2,8 +2,7 @@ import dotenv from 'dotenv'
 import express from 'express'
 import cors from 'cors'
 import { initPool, closePool } from './db/db.js'
-import { consultaController } from './controllers/consultaController.js'
-import { pingDb } from './controllers/pingDb.js'
+import apiRouter from './routes/api.routes.js'
 
 dotenv.config()
 const app = express()
@@ -23,7 +22,7 @@ app.use(cors({
 }))
 
 app.use(express.json())
-initPool()
+initPool().catch(err => console.warn('Aviso: Base de datos no conectada al inicio:', err.message || err))
 const PORT = process.env.PORT || 3001
 
 /* Puerto utilizado por el servidor en consola */
@@ -31,19 +30,15 @@ app.listen(PORT, () => {
   console.log(`Servidor escuchando en http://localhost:${PORT}`)
 })
 
-// Ruta de prueba
+// Rutas de la API bajo /api
+app.use('/api', apiRouter)
+
+// Ruta de prueba raíz y retrocompatibilidad
 app.get('/', (req, res) => {
   res.send({ message: 'Servidor Express para generador IA de consultas SQL 🚀' })
 })
-
-// Generar consulta
-app.post('/generar-consulta', consultaController)
-
-// Ping a la DB
-app.get('/db-ping', pingDb);
-
-// Cierre del pool al apagar el servidor
-['SIGINT', 'SIGTERM'].forEach(sig => {
+const signals = ['SIGINT', 'SIGTERM']
+signals.forEach(sig => {
   process.on(sig, async () => {
     console.log(`\nRecibí ${sig}, cerrando pool...`)
     await closePool()

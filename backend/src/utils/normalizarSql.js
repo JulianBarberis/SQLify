@@ -1,36 +1,85 @@
-// --- helper de sanitización ---
+import pkg from 'node-sql-parser'
+const { Parser } = pkg
+
+const parser = new Parser()
+
+const ALLOWED_TABLES = new Set([
+  'usuario',
+  'artista',
+  'album',
+  'cancion',
+  'reproduccion',
+  'playlist',
+  'cancion_artista',
+  'album_artista',
+  'playlist_cancion'
+])
+
+const BANNED_PATTERNS = [
+  /\bsleep\s*\(/i,
+  /\bbenchmark\s*\(/i,
+  /\bload_file\s*\(/i,
+  /\bsys_eval\s*\(/i,
+  /\bsys_exec\s*\(/i,
+  /\binto\s+(?:outfile|dumpfile)\b/i
+]
 
 export function normalizeGeneratedSql(raw) {
-  let s = (raw || '')
-    // quita fences markdown y comentarios con codigo regex que no entiendo
+  if (!raw || typeof raw !== 'string') return null
+
+  // Limpiar markdown fences y comentarios
+  let clean = raw
     .replace(/```sql/gi, '')
     .replace(/```/g, '')
     .replace(/^\s*--.*$/gm, '')
     .replace(/\/\*[\s\S]*?\*\//g, '')
     .trim()
 
-  // extrae desde el PRIMER SELECT que aparezca hasta el final
-  const m = s.match(/select\b[\s\S]*$/i)
-  s = m ? m[0].trim() : ''
+  // Extraer desde el primer SELECT
+  const m = clean.match(/select\b[\s\S]*$/i)
+  clean = m ? m[0].trim() : ''
+  if (!clean) return null
 
-  // si no empieza con SELECT -> null
-  if (!/^\s*select\b/i.test(s)) return null
+  // Quitar punto y coma final
+  clean = clean.replace(/;+\s*$/, '')
+  if (clean.includes(';')) {
+    clean = clean.split(';')[0].trim()
+  }
 
-  // quita ; finales repetidos y asegura UNA sola sentencia
-  s = s.replace(/;+\s*$/,'')
+  // Comprobar patrones prohibidos en texto
+  for (const pattern of BANNED_PATTERNS) {
+    if (pattern.test(clean)) {
+      return null
+    }
+  }
 
-  // si aún quedaron múltiples statements (p. ej. "SELECT ...; DROP ..."),
-  // nos quedamos solo con lo que está antes del primer ';'
-  if (s.includes(';')) s = s.split(';')[0].trim()
+  try {
+    const ast = parser.astify(clean, { database: 'mariadb' })
+    const statements = Array.isArray(ast) ? ast : [ast]
 
-  // defensa básica: bloquear DDL/DML peligrosos por si escaparon
-  const banned = /\b(insert|update|delete|drop|alter|truncate|create|grant|revoke)\b/i
-  if (banned.test(s)) return null
+    // Exactamente 1 statement y debe ser SELECT
+    if (statements.length !== 1) return null
+    if (statements[0].type !== 'select') return null
 
-  return s
+    // Validar tablas involucradas
+    const tableList = parser.tableList(clean, { database: 'mariadb' })
+    if (!tableList || tableList.length === 0) return null
+
+    for (const tbl of tableList) {
+      const parts = tbl.split('::')
+      const tableName = parts[parts.length - 1]?.toLowerCase()
+      if (!tableName || !ALLOWED_TABLES.has(tableName)) {
+        return null
+      }
+    }
+
+    return clean
+  } catch {
+    // Si la consulta no es válida según la gramática SQL de MariaDB
+    return null
+  }
 }
 
-export function fallbackSql(msg='Consulta no relacionada con la base de datos') {
-  // siempre SQL válido y seguro
+export function fallbackSql(msg = 'Consulta no relacionada con la base de datos') {
   return `SELECT ${JSON.stringify(msg)} AS mensaje`
 }

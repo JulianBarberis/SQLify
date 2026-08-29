@@ -1,9 +1,10 @@
 import './App.css';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
+import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { sendRequest } from './service/appService';
-import {ResultTable} from './components/table/resultTable';
+import { ResultTable } from './components/table/resultTable';
 import type { DataResponseModel } from './models/data-response.model';
 import { parseApiError } from './clases/error-parser';
 import logo from './assets/logo-completo.png';
@@ -13,38 +14,53 @@ function App() {
     const [userQuery, setuserQuery] = useState('');
     const [result, setResult] = useState<DataResponseModel | null>(null);
     const [loading, setLoading] = useState(false);
+    const abortControllerRef = useRef<AbortController | null>(null);
 
-    const information: string = 'A tener en cuenta: las consultas muy complejas pueden ser generadas de forma erronea, lo que produce un error al correr la query, de ser asi se mostrara unicamente la query.';
-  
+    const information: string = 'A tener en cuenta: las consultas muy complejas pueden ser generadas de forma errónea, lo que produce un error al correr la query. De ser así, se mostrará únicamente la query.';
+
+    useEffect(() => {
+      return () => {
+        abortControllerRef.current?.abort();
+      };
+    }, []);
+
     async function runQuery(e: React.FormEvent<HTMLFormElement>): Promise<void> {
       e.preventDefault();
-      if (userQuery.length === 0){
+      const trimmedQuery = userQuery.trim();
+      if (!trimmedQuery) {
         toast.error('Por favor ingrese una consulta');
-      } else {
-        setResult(null);
-        setLoading(true);
-      
-        try {
-          // ------ TESTING API ------
-          // const response = await testingAPI();
-          // toast.success(response.message)
-          // ------------
-          
-          const respose = await sendRequest(userQuery);
-          setResult(respose);
-          toast.success(respose.explain);
-    
-        } catch (err) {
-          const error = parseApiError(err);
-          toast.error(error.title, { autoClose: 8000 });
+        return;
+      }
 
-          if (error.detail) {
-            toast.info(error.detail, { autoClose: 10000 });
-          }
-          if (error.sql) {
-            setResult({ sql: error.sql });
-          }
-        } finally {
+      abortControllerRef.current?.abort();
+      const controller = new AbortController();
+      abortControllerRef.current = controller;
+
+      setResult(null);
+      setLoading(true);
+
+      try {
+        const response = await sendRequest(trimmedQuery, controller.signal);
+        setResult(response);
+        if (response.explain) {
+          toast.success(response.explain);
+        }
+      } catch (err) {
+        if (axios.isCancel(err)) {
+          return;
+        }
+
+        const error = parseApiError(err);
+        toast.error(error.title, { autoClose: 8000 });
+
+        if (error.detail) {
+          toast.info(error.detail, { autoClose: 10000 });
+        }
+        if (error.sql) {
+          setResult({ sql: error.sql });
+        }
+      } finally {
+        if (abortControllerRef.current === controller) {
           setLoading(false);
         }
       }

@@ -93,7 +93,7 @@ describe('consultaController', () => {
       error: 'Hubo un error en la consulta',
       sql: '```sql La pregunta no tiene relación con la base de datos;```',
       detail:
-        'La consulta SQL generada por Gemini es inválida, porfavor inténtelo de nuevo reformulando el ingreso de datos'
+        'La consulta SQL generada por Gemini es inválida o no cumple con las políticas de seguridad. Por favor inténtelo de nuevo reformulando su consulta.'
     })
   })
 

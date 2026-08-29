@@ -23,7 +23,7 @@ export default [
       indent: ['warn', 2],
       'no-extra-parens': 'warn',
       'no-nested-ternary': 'error',
-      'linebreak-style': ['error', 'windows'],
+      'linebreak-style': 'off',
       'no-cond-assign': ['error', 'always'],
       'no-console': 'off',
       'no-unused-vars': 'warn'
