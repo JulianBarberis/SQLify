@@ -7,16 +7,28 @@ import apiRouter from './routes/api.routes.js'
 dotenv.config()
 const app = express()
 
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://localhost:5174',
+  'http://localhost:3000',
+  'http://158.69.212.87',
+  'http://158.69.212.87:5173',
+  'http://158.69.212.87:3000'
+]
+
 app.use(cors({
-  origin: [
-    'http://localhost:5173',         // para desarrollo local
-    'http://localhost:3000',
-    'http://158.69.212.87',         // IP pública del VPS
-    'http://158.69.212.87:5173',    // Front alojado en el VPS
-    'http://158.69.212.87:3000'     
-  ],
-  methods: ['GET', 'POST'],
-  allowedHeaders: ['Content-Type'],
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true)
+    if (/^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) {
+      return callback(null, true)
+    }
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true)
+    }
+    return callback(new Error(`Origen ${origin} no permitido por CORS`), false)
+  },
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: false,
   maxAge: 3600
 }))

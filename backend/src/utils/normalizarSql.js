@@ -46,6 +46,11 @@ export function normalizeGeneratedSql(raw) {
     clean = clean.split(';')[0].trim()
   }
 
+  // Auto-corregir LIMIT colgante sin número
+  if (/\blimit\s*$/i.test(clean)) {
+    clean = clean.replace(/\blimit\s*$/i, 'LIMIT 100')
+  }
+
   // Comprobar patrones prohibidos en texto
   for (const pattern of BANNED_PATTERNS) {
     if (pattern.test(clean)) {
@@ -54,7 +59,12 @@ export function normalizeGeneratedSql(raw) {
   }
 
   try {
-    const ast = parser.astify(clean, { database: 'mariadb' })
+    let ast
+    try {
+      ast = parser.astify(clean, { database: 'mariadb' })
+    } catch {
+      ast = parser.astify(clean, { database: 'mysql' })
+    }
     const statements = Array.isArray(ast) ? ast : [ast]
 
     // Exactamente 1 statement y debe ser SELECT
@@ -62,7 +72,12 @@ export function normalizeGeneratedSql(raw) {
     if (statements[0].type !== 'select') return null
 
     // Validar tablas involucradas
-    const tableList = parser.tableList(clean, { database: 'mariadb' })
+    let tableList
+    try {
+      tableList = parser.tableList(clean, { database: 'mariadb' })
+    } catch {
+      tableList = parser.tableList(clean, { database: 'mysql' })
+    }
     if (!tableList || tableList.length === 0) return null
 
     for (const tbl of tableList) {
@@ -75,7 +90,7 @@ export function normalizeGeneratedSql(raw) {
 
     return clean
   } catch {
-    // Si la consulta no es válida según la gramática SQL de MariaDB
+    // Si la consulta no es válida según la gramática SQL
     return null
   }
 }
