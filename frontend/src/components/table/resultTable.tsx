@@ -54,7 +54,7 @@ export const ResultTable = React.memo(function ResultTable({ executed }: Props) 
               <th
                 key={header.key}
                 scope="col"
-                className={`table-header ${columnAlignments[header.key] || 'col-left'}`}
+                className={`table-header ${columnAlignments[header.key]}`}
               >
                 {header.label}
               </th>
@@ -69,7 +69,7 @@ export const ResultTable = React.memo(function ResultTable({ executed }: Props) 
               <tr key={rowKey}>
                 {orderedHeaders.map((header) => {
                   const cell = header.key === '#' ? i + 1 : row[header.key];
-                  const alignClass = columnAlignments[header.key] || 'col-left';
+                  const alignClass = columnAlignments[header.key];
 
                   return (
                     <td key={header.key} className={`data ${alignClass}`}>

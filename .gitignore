@@ -10,6 +10,11 @@ node_modules/
 !.env.example
 !.env.docker.example
 
+# Test artifacts & coverage
+coverage/
+test-results/
+playwright-report/
+
 # OS metadata
 .DS_Store
 .DS_Store?

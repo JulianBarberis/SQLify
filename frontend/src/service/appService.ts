@@ -3,8 +3,12 @@ import type { DataResponseModel } from '../models/data-response.model';
 import type { RequestModel } from '../models/request.model';
 import { parseApiError } from '../clases/error-parser';
 
+export const getBaseUrl = (): string => {
+  return import.meta.env.VITE_APP_API_URL || 'http://localhost:3001';
+};
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_APP_API_URL || 'http://localhost:3001',
+  baseURL: getBaseUrl(),
   timeout: 45000,
   headers: {
     'Content-Type': 'application/json',
