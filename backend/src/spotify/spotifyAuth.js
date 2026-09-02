@@ -4,7 +4,15 @@ import dotenv from 'dotenv'
 
 dotenv.config()
 
+let cachedToken = null
+let tokenExpiresAt = 0
+
 const getSpotifyToken = async () => {
+  // Reutilizar token si aún es válido (margen de 60 segundos antes de expirar)
+  if (cachedToken && Date.now() < tokenExpiresAt - 60000) {
+    return cachedToken
+  }
+
   const clientId = process.env.SPOTIFY_CLIENT_ID
   const clientSecret = process.env.SPOTIFY_CLIENT_SECRET
 
@@ -17,7 +25,11 @@ const getSpotifyToken = async () => {
   }
 
   const res = await axios.post(tokenUrl, data, { headers })
-  return res.data.access_token
+  cachedToken = res.data.access_token
+  const expiresInMs = (res.data.expires_in || 3600) * 1000
+  tokenExpiresAt = Date.now() + expiresInMs
+
+  return cachedToken
 }
 
 export default getSpotifyToken

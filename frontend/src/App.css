@@ -162,6 +162,19 @@ textarea:focus {
   cursor: not-allowed;
 }
 
+.keyboard-hint {
+  display: block;
+  text-align: center;
+  font-size: var(--primitive-font-xs);
+  color: var(--color-text-muted);
+  margin-top: var(--primitive-space-2);
+}
+
+.keyboard-hint strong {
+  color: var(--color-text-secondary);
+  font-weight: 600;
+}
+
 p {
   color: var(--color-fuente-secundario);
   margin: 0.75rem 0;
