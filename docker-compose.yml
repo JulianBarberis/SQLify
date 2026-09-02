@@ -5,6 +5,7 @@ services:
   db:
     image: mysql:8.0
     container_name: sqlify-mysql
+    command: --lower-case-table-names=1 --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASS:-rootpassword}
@@ -15,7 +16,7 @@ services:
       - "${DB_PORT:-3306}:3306"
     volumes:
       - mysql_data:/var/lib/mysql
-      - ./backend/SQLify.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+      - ./backend/src/db/scripts/dump.sql:/docker-entrypoint-initdb.d/01-dump.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u root -p${DB_ROOT_PASS:-rootpassword}"]
       interval: 5s

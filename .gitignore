@@ -1,6 +1,10 @@
 .agents
 AUDIT_REPORT.md
 PROJECT.md
+.env
+.env.*
+!.env.example
+!.env.docker.example
 
 # OS metadata
 .DS_Store
