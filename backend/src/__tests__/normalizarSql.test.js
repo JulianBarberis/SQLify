@@ -22,7 +22,7 @@ describe('normalizarSql with AST Parser', () => {
   it('blocks non-SELECT DML statements (INSERT, UPDATE, DELETE)', () => {
     expect(normalizeGeneratedSql("INSERT INTO Usuario (nombre) VALUES ('hacker');")).toBeNull()
     expect(normalizeGeneratedSql("UPDATE Usuario SET nombre = 'hacker';")).toBeNull()
-    expect(normalizeGeneratedSql("DELETE FROM Usuario WHERE id = 1;")).toBeNull()
+    expect(normalizeGeneratedSql('DELETE FROM Usuario WHERE id = 1;')).toBeNull()
   })
 
   it('blocks dangerous functions (SLEEP, BENCHMARK, LOAD_FILE)', () => {

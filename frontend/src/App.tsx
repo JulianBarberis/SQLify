@@ -14,6 +14,7 @@ function App() {
     const [userQuery, setuserQuery] = useState('');
     const [result, setResult] = useState<DataResponseModel | null>(null);
     const [loading, setLoading] = useState(false);
+    const [showInfo, setShowInfo] = useState(false);
     const abortControllerRef = useRef<AbortController | null>(null);
 
     const information: string = 'A tener en cuenta: las consultas muy complejas pueden ser generadas de forma errónea, lo que produce un error al correr la query. De ser así, se mostrará únicamente la query.';
@@ -80,12 +81,35 @@ function App() {
             <form className='form-conatainer' onSubmit={runQuery}>
               <div className='info-container'>
                 <label htmlFor="askme-input">Escribí lo que quieras escuchar</label>
-                <img src={infoIcon} alt="" title={information}/>
+                <button
+                  type="button"
+                  className="tooltip-trigger"
+                  aria-label="Información adicional sobre consultas"
+                  aria-expanded={showInfo}
+                  aria-controls="query-disclaimer"
+                  onClick={() => setShowInfo(prev => !prev)}
+                  onFocus={() => setShowInfo(true)}
+                  onBlur={() => setShowInfo(false)}
+                  onMouseEnter={() => setShowInfo(true)}
+                  onMouseLeave={() => setShowInfo(false)}
+                >
+                  <img src={infoIcon} alt="" aria-hidden="true" />
+                </button>
+                {showInfo && (
+                  <div id="query-disclaimer" role="tooltip" className="tooltip-box">
+                    {information}
+                  </div>
+                )}
               </div>
-              <textarea id="askme-input" rows={4} value={userQuery} onChange={e=>setuserQuery(e.target.value)} />
-                <button className='primary-button' type="submit" disabled={loading}>{loading ? 'EJECUTANDO…' : 'BUSCAR'}</button>
-                {/* <button type="button" onClick={downloadCsv} disabled={!rows.length}>Exportar CSV</button> */}
-           
+              <textarea
+                id="askme-input"
+                rows={4}
+                value={userQuery}
+                aria-describedby={showInfo ? 'query-disclaimer' : undefined}
+                onChange={e=>setuserQuery(e.target.value)}
+              />
+              <button className='primary-button' type="submit" disabled={loading}>{loading ? 'EJECUTANDO…' : 'BUSCAR'}</button>
+              {/* <button type="button" onClick={downloadCsv} disabled={!rows.length}>Exportar CSV</button> */}
             </form>
           </div>
         </div>

@@ -33,7 +33,7 @@ export const fetchSpotifyData = async (genre = 'rock') => {
     a => a.popularity > 20 && (a.followers?.total || 0) > 50000
   )
 
-  allArtists.push(...(artists.length > 0 ? artists : rawArtists))
+  allArtists.push(...artists.length > 0 ? artists : rawArtists)
 
   console.log(`✅ ${allArtists.length} artistas encontrados. Obteniendo álbumes y canciones...`)
 

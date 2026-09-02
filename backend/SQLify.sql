@@ -128,7 +128,9 @@ CREATE TABLE Reproduccion (
     ON UPDATE CASCADE,
   FOREIGN KEY (ID_Cancion) REFERENCES Cancion(ID_Cancion)
     ON DELETE CASCADE
-    ON UPDATE CASCADE
+    ON UPDATE CASCADE,
+  INDEX idx_repro_usuario_fecha (ID_Usuario, fecha),
+  INDEX idx_repro_cancion_fecha (ID_Cancion, fecha)
 );
 
 
