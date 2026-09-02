@@ -1,6 +1,7 @@
 .agents
 AUDIT_REPORT.md
 PROJECT.md
+DEPLOYMENT.md
 node_modules/
 .pnpm-store/
 *.pnpm-store/
