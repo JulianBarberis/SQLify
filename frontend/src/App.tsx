@@ -7,6 +7,7 @@ import { sendRequest } from './service/appService';
 import { ResultTable } from './components/table/resultTable';
 import { SqlCodeViewer } from './components/SqlCodeViewer';
 import { ErrorAlert } from './components/ErrorAlert';
+import { PromptChips } from './components/PromptChips';
 import type { DataResponseModel } from './models/data-response.model';
 import { parseApiError } from './clases/error-parser';
 import logo from './assets/logo-completo.png';
@@ -122,12 +123,29 @@ function App() {
               value={userQuery}
               aria-describedby={showInfo ? 'query-disclaimer' : undefined}
               onChange={e => setUserQuery(e.target.value)}
+              onKeyDown={e => {
+                if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                  e.preventDefault();
+                  executeSearch(userQuery);
+                }
+              }}
               placeholder="Ej. Top 10 artistas más escuchados el último mes..."
+            />
+
+            <PromptChips
+              disabled={loading}
+              onSelectPrompt={prompt => {
+                setUserQuery(prompt);
+                executeSearch(prompt);
+              }}
             />
 
             <button className="primary-button" type="submit" disabled={loading}>
               {loading ? 'EJECUTANDO…' : 'BUSCAR'}
             </button>
+            <span className="keyboard-hint">
+              Tip: Presiona <strong>Ctrl + Enter</strong> o <strong>Cmd + Enter</strong> para buscar
+            </span>
           </form>
         </div>
       </div>
