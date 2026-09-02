@@ -3,6 +3,7 @@ import express from 'express'
 import cors from 'cors'
 import { initPool, closePool } from './db/db.js'
 import apiRouter from './routes/api.routes.js'
+import { errorHandler } from './middlewares/errorHandler.js'
 
 dotenv.config()
 const app = express()
@@ -49,6 +50,9 @@ app.use('/api', apiRouter)
 app.get('/', (req, res) => {
   res.send({ message: 'Servidor Express para generador IA de consultas SQL 🚀' })
 })
+
+// Middleware global de manejo de errores
+app.use(errorHandler)
 const signals = ['SIGINT', 'SIGTERM']
 signals.forEach(sig => {
   process.on(sig, async () => {

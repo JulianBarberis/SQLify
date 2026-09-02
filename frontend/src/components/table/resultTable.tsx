@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import type { ExecuteModel } from '../../models/execute.model';
 import type { TableHeaderModel } from '../../models/table-header.model';
+import { EmptyState } from '../EmptyState';
 import './resultTable.css';
 
 type Props = { executed: ExecuteModel };
@@ -21,12 +22,25 @@ export const ResultTable = React.memo(function ResultTable({ executed }: Props) 
     const ordered: string[] = ['#', ...noUrlKeys, ...urlKeys];
     return ordered.map((k) => ({
       key: k,
-      label: k === '#' ? '#' : k.charAt(0).toUpperCase() + k.slice(1),
+      label: k === '#' ? '#' : k.charAt(0).toUpperCase() + k.slice(1).replace(/_/g, ' '),
     }));
   }, [rows]);
 
+  const columnAlignments = useMemo<Record<string, 'col-left' | 'col-right' | 'col-center'>>(() => {
+    const aligns: Record<string, 'col-left' | 'col-right' | 'col-center'> = {};
+    for (const header of orderedHeaders) {
+      if (header.key === '#' || haveUrl(header.key)) {
+        aligns[header.key] = 'col-center';
+      } else {
+        const sample = rows.find(r => r[header.key] !== null && r[header.key] !== undefined)?.[header.key];
+        aligns[header.key] = typeof sample === 'number' ? 'col-right' : 'col-left';
+      }
+    }
+    return aligns;
+  }, [orderedHeaders, rows]);
+
   if (rows.length === 0) {
-    return <p className="no-results">Sin resultados.</p>;
+    return <EmptyState />;
   }
 
   return (
@@ -35,7 +49,11 @@ export const ResultTable = React.memo(function ResultTable({ executed }: Props) 
         <thead>
           <tr>
             {orderedHeaders.map((header) => (
-              <th key={header.key} scope="col" className="table-header">
+              <th
+                key={header.key}
+                scope="col"
+                className={`table-header ${columnAlignments[header.key] || 'col-left'}`}
+              >
                 {header.label}
               </th>
             ))}
@@ -44,14 +62,15 @@ export const ResultTable = React.memo(function ResultTable({ executed }: Props) 
 
         <tbody>
           {rows.map((row, i) => {
-            const rowKey = String(row.id ?? row.id_cancion ?? row.id_usuario ?? `row-${i}`);
+            const rowKey = String(row.id ?? row.ID_Cancion ?? row.ID_Artista ?? row.ID_Usuario ?? `row-${i}`);
             return (
               <tr key={rowKey}>
                 {orderedHeaders.map((header) => {
                   const cell = header.key === '#' ? i + 1 : row[header.key];
+                  const alignClass = columnAlignments[header.key] || 'col-left';
 
                   return (
-                    <td key={header.key} className="data">
+                    <td key={header.key} className={`data ${alignClass}`}>
                       {header.key !== '#' && haveUrl(header.key) ? (
                         <div className="data play-container">
                           <a
