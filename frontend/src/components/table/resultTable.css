@@ -5,6 +5,7 @@
   background-color: var(--card-bg);
   border: 1px solid var(--card-border);
   box-shadow: var(--card-shadow);
+  word-break: normal;
 }
 
 .table {
@@ -12,6 +13,7 @@
   border-collapse: collapse;
   font-size: var(--primitive-font-sm);
   text-align: left;
+  word-break: normal;
 }
 
 .table thead {
@@ -33,6 +35,18 @@
 .table-header.col-right { text-align: right; }
 .table-header.col-center { text-align: center; }
 
+.table-header.col-index,
+.data.col-index {
+  width: 1%;
+  min-width: 52px;
+  white-space: nowrap;
+  text-align: center;
+  font-family: var(--primitive-font-mono);
+  font-size: var(--primitive-font-xs);
+  color: var(--color-text-muted);
+  user-select: none;
+}
+
 .table tbody tr {
   border-bottom: 1px solid var(--color-border-subtle);
   transition: background-color 0.15s ease;
@@ -51,6 +65,7 @@
   color: var(--color-text-primary);
   line-height: 1.5;
   vertical-align: middle;
+  white-space: nowrap;
 }
 
 .data.col-left { text-align: left; }

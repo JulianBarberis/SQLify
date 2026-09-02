@@ -12,6 +12,9 @@ export interface ErrorAlertProps {
 
 function resolveCategoryBadge(title: string, status?: number): string {
   const lower = title.toLowerCase();
+  if (lower.includes('timeout') || lower.includes('exceeded') || lower.includes('tiempo de espera')) {
+    return 'Tiempo Agotado';
+  }
   if (status === 429 || lower.includes('demasiadas-peticiones') || lower.includes('rate limit')) {
     return 'Límite Excedido';
   }
@@ -36,6 +39,11 @@ export const ErrorAlert: React.FC<ErrorAlertProps> = React.memo(({
   onDismiss,
 }) => {
   const badgeText = resolveCategoryBadge(title, status);
+  const displayDetail = detail || (
+    title.toLowerCase().includes('timeout') || title.toLowerCase().includes('exceeded')
+      ? 'La consulta tardó más de lo esperado en procesarse. El servicio de IA pudo experimentar una sobrecarga momentánea. Por favor, intenta nuevamente.'
+      : undefined
+  );
 
   return (
     <section className="error-alert-container" role="alert" aria-live="assertive">
@@ -66,7 +74,7 @@ export const ErrorAlert: React.FC<ErrorAlertProps> = React.memo(({
         )}
       </div>
 
-      {detail && <p className="error-alert-detail">{detail}</p>}
+      {displayDetail && <p className="error-alert-detail">{displayDetail}</p>}
 
       {sql && (
         <details className="error-sql-details">
