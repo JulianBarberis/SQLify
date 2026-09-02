@@ -80,5 +80,5 @@ export async function consultarGemini({ question, schemaDDL, limit }) {
     }
   }
 
-  throw new Error(`Hubo un error al enviar la consulta a Gemini: ${lastError ? (lastError.message || String(lastError)) : 'Error desconocido'}`)
+  throw new Error(`Hubo un error al enviar la consulta a Gemini: ${lastError ? lastError.message || String(lastError) : 'Error desconocido'}`)
 }

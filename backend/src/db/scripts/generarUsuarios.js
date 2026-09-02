@@ -26,7 +26,7 @@ async function generarUsuarios(cantidad) {
     console.log('¡Conectado a la base de datos "sqlify"!')
 
     // 5. Preparar la consulta SQL
-    const sql = 'INSERT INTO usuario (nombre, email, plan, fecha_alta) VALUES (?, ?, ?, ?)'
+    const sql = 'INSERT INTO Usuario (nombre, email, plan, fecha_alta) VALUES (?, ?, ?, ?)'
 
     console.log(`Generando ${cantidad} usuarios falsos...`)
 
