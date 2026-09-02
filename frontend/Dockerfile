@@ -5,8 +5,10 @@ FROM node:22-alpine3.20 AS dev
 
 WORKDIR /app
 
-COPY package.json package-lock.json ./
-RUN npm ci
+RUN corepack enable && corepack prepare pnpm@latest --activate
+
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+RUN pnpm install --frozen-lockfile
 
 COPY . .
 
@@ -14,7 +16,7 @@ ENV VITE_APP_API_URL=http://localhost:3001
 
 EXPOSE 5173
 
-CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
+CMD ["pnpm", "run", "dev", "--", "--host", "0.0.0.0"]
 
 # ==============================================================================
 # 2. STAGE: Build (Static compilation)
@@ -23,15 +25,17 @@ FROM node:22-alpine3.20 AS build
 
 WORKDIR /app
 
+RUN corepack enable && corepack prepare pnpm@latest --activate
+
 # Argumento opcional para inyectar URL de backend durante compilación
 ARG VITE_APP_API_URL
 ENV VITE_APP_API_URL=${VITE_APP_API_URL}
 
-COPY package.json package-lock.json ./
-RUN npm ci
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+RUN pnpm install --frozen-lockfile
 
 COPY . .
-RUN npm run build
+RUN pnpm run build
 
 # ==============================================================================
 # 3. STAGE: Production (Nginx Web Server)

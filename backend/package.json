@@ -38,5 +38,6 @@
     "globals": "^16.4.0",
     "jest": "^30.2.0",
     "nodemon": "^3.1.10"
-  }
+  },
+  "packageManager": "pnpm@11.22.0"
 }

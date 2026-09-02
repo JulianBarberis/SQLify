@@ -125,7 +125,7 @@ docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
 3. Configuración del proyecto en Vercel:
    - **Framework Preset:** `Vite`
    - **Root Directory:** `./` (el archivo `vercel.json` en la raíz se encarga de compilar `frontend/`) o selecciona `frontend`.
-   - **Build Command:** `npm --prefix frontend run build` (o automático si la raíz es `frontend`).
+   - **Build Command:** `pnpm --prefix frontend run build` (o automático si la raíz es `frontend`).
    - **Output Directory:** `frontend/dist` (o `dist`).
 4. **Variables de Entorno en Vercel:**
    - Añade `VITE_APP_API_URL` con la URL HTTPS de tu backend en producción (ej. `https://sqlify-api.up.railway.app`).
