@@ -60,10 +60,10 @@ test.describe('SQLify Full-Stack E2E Suite', () => {
     await expect(chips).toHaveCount(5);
     await expect(chips.first()).toBeVisible();
 
-    // Probar el tooltip de información
+    // Probar el tooltip de información mediante hover
     const infoButton = page.getByRole('button', { name: /información adicional sobre consultas/i });
-    await infoButton.click();
-    await expect(page.getByRole('tooltip')).toBeVisible();
+    await infoButton.hover();
+    await expect(page.locator('#query-disclaimer')).toBeVisible();
   });
 
   test('muestra notificación de error si se envía el formulario vacío', async ({ page }) => {
@@ -112,7 +112,7 @@ test.describe('SQLify Full-Stack E2E Suite', () => {
     await page.getByRole('button', { name: 'BUSCAR' }).click();
 
     // ErrorAlert visible
-    const alert = page.getByRole('alert');
+    const alert = page.locator('.error-alert-container');
     await expect(alert).toBeVisible();
     await expect(alert).toContainText('Error sintáctico en la consulta generada');
 

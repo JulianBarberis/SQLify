@@ -264,8 +264,6 @@ describe('App Component Integration', () => {
   });
 
   it('no altera el estado de loading si otra búsqueda posterior toma el control', async () => {
-    const user = userEvent.setup();
-
     vi.spyOn(appService, 'sendRequest')
       .mockImplementationOnce((_q, signal) => {
         return new Promise((_, reject) => {
