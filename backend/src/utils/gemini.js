@@ -48,8 +48,8 @@ export async function consultarGemini({ question, schemaDDL, limit }) {
   const candidateModels = [
     preferredModel,
     'gemini-3.5-flash-lite',
+    'gemini-2.5-flash',
     'gemini-3.6-flash',
-    'gemini-2.5-flash'
   ].filter((m, i, arr) => arr.indexOf(m) === i)
 
   let lastError = null
@@ -65,7 +65,18 @@ export async function consultarGemini({ question, schemaDDL, limit }) {
         },
       })
 
-      const result = await model.generateContent(userPrompt)
+      const timeoutMs = 12000
+      const timeoutPromise = new Promise((_, reject) => {
+        const timer = setTimeout(() => {
+          reject(new Error(`Tiempo de espera de ${timeoutMs / 1000}s agotado para el modelo ${modelName}`))
+        }, timeoutMs)
+        timer.unref?.()
+      })
+
+      const result = await Promise.race([
+        model.generateContent(userPrompt),
+        timeoutPromise,
+      ])
       const text = result?.response?.text?.()
 
       if (!text) {
