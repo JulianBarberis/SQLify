@@ -7,16 +7,27 @@ let pool = null
 
 export async function initPool() {
   if (!pool) {
-    const dbName = process.env.DB_NAME || ''
-    pool = mysql.createPool({
-      host: process.env.DB_HOST || '127.0.0.1',
-      port: Number(process.env.DB_PORT || 3306),
-      user: process.env.DB_USER || 'root',
-      password: process.env.DB_PASS || '',
+    const host = process.env.DB_HOST || process.env.MYSQLHOST || '127.0.0.1'
+    const port = Number(process.env.DB_PORT || process.env.MYSQLPORT || 3306)
+    const user = process.env.DB_USER || process.env.MYSQLUSER || 'root'
+    const password = process.env.DB_PASS || process.env.MYSQLPASSWORD || ''
+    const dbName = process.env.DB_NAME || process.env.MYSQLDATABASE || ''
+
+    const config = {
+      host,
+      port,
+      user,
+      password,
       database: dbName,
       waitForConnections: true,
       connectionLimit: 10,
-    })
+    }
+
+    if (process.env.DB_SSL === 'true' || process.env.MYSQL_SSL === 'true') {
+      config.ssl = { rejectUnauthorized: false }
+    }
+
+    pool = mysql.createPool(config)
 
     if (dbName) {
       const conn = await pool.getConnection()

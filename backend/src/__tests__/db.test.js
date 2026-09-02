@@ -61,6 +61,13 @@ describe('db (db/db.js)', () => {
     delete process.env.DB_USER
     delete process.env.DB_PASS
     delete process.env.DB_NAME
+    delete process.env.MYSQLHOST
+    delete process.env.MYSQLPORT
+    delete process.env.MYSQLUSER
+    delete process.env.MYSQLPASSWORD
+    delete process.env.MYSQLDATABASE
+    delete process.env.DB_SSL
+    delete process.env.MYSQL_SSL
 
     const pool = await initPool()
 
@@ -74,6 +81,48 @@ describe('db (db/db.js)', () => {
       })
     )
     expect(pool).toBe(mockPool)
+  })
+
+  it('initPool soporta variables de entorno nativas de Railway (MYSQLHOST, MYSQLPORT, etc.)', async () => {
+    delete process.env.DB_HOST
+    delete process.env.DB_PORT
+    delete process.env.DB_USER
+    delete process.env.DB_PASS
+    delete process.env.DB_NAME
+
+    process.env.MYSQLHOST = 'mysql.railway.internal'
+    process.env.MYSQLPORT = '3306'
+    process.env.MYSQLUSER = 'railway_root'
+    process.env.MYSQLPASSWORD = 'railway_secret'
+    process.env.MYSQLDATABASE = 'railway'
+    process.env.DB_SSL = 'true'
+
+    const pool = await initPool()
+
+    expect(mockCreatePool).toHaveBeenCalledWith(
+      expect.objectContaining({
+        host: 'mysql.railway.internal',
+        port: 3306,
+        user: 'railway_root',
+        password: 'railway_secret',
+        database: 'railway',
+        ssl: { rejectUnauthorized: false }
+      })
+    )
+    expect(pool).toBe(mockPool)
+  })
+
+  it('initPool habilita SSL con MYSQL_SSL="true"', async () => {
+    delete process.env.DB_SSL
+    process.env.MYSQL_SSL = 'true'
+
+    await initPool()
+
+    expect(mockCreatePool).toHaveBeenCalledWith(
+      expect.objectContaining({
+        ssl: { rejectUnauthorized: false }
+      })
+    )
   })
 
   it('initPool reutiliza el pool existente si ya fue inicializado', async () => {

@@ -8,6 +8,7 @@
     "test:coverage": "node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage --runInBand",
     "start": "node ./src/index.js",
     "dev": "nodemon ./src/index.js",
+    "db:seed": "node src/db/scripts/seed.js",
     "lint": "eslint src",
     "lint:fix": "eslint src --fix"
   },
