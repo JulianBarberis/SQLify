@@ -1,0 +1,38 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      target: production
+    restart: always
+    volumes: [] # Sin bind mounts en producción
+    environment:
+      NODE_ENV: production
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+
+  frontend:
+    build:
+      context: ./frontend
+      target: production
+      args:
+        VITE_APP_API_URL: ${VITE_APP_API_URL:-http://localhost:3001}
+    restart: always
+    ports:
+      - "${PROD_HTTP_PORT:-80}:80"
+    volumes: []
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+
+  db:
+    restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1024M

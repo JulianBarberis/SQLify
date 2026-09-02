@@ -1,0 +1,90 @@
+services:
+  # ============================================================================
+  # 1. Base de Datos Relacional: MySQL 8.0
+  # ============================================================================
+  db:
+    image: mysql:8.0
+    container_name: sqlify-mysql
+    command: --lower-case-table-names=1 --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASS:-rootpassword}
+      MYSQL_DATABASE: ${DB_NAME:-SQLify}
+      MYSQL_USER: ${DB_USER:-sqlify_user}
+      MYSQL_PASSWORD: ${DB_PASS:-sqlify_pass}
+    ports:
+      - "${DB_PORT:-3306}:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./backend/src/db/scripts/dump.sql:/docker-entrypoint-initdb.d/01-dump.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u root -p${DB_ROOT_PASS:-rootpassword}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 15s
+    networks:
+      - sqlify-network
+
+  # ============================================================================
+  # 2. Servidor API: Node.js Express + Gemini AI
+  # ============================================================================
+  backend:
+    build:
+      context: ./backend
+      target: dev
+    container_name: sqlify-backend
+    restart: unless-stopped
+    ports:
+      - "${BACKEND_PORT:-3001}:3001"
+    environment:
+      NODE_ENV: development
+      PORT: 3001
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_USER: ${DB_USER:-sqlify_user}
+      DB_PASS: ${DB_PASS:-sqlify_pass}
+      DB_NAME: ${DB_NAME:-SQLify}
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-3.5-flash-lite}
+      SPOTIFY_CLIENT_ID: ${SPOTIFY_CLIENT_ID:-}
+      SPOTIFY_CLIENT_SECRET: ${SPOTIFY_CLIENT_SECRET:-}
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - sqlify-network
+
+  # ============================================================================
+  # 3. Interfaz de Usuario: React 19 + Vite
+  # ============================================================================
+  frontend:
+    build:
+      context: ./frontend
+      target: dev
+    container_name: sqlify-frontend
+    restart: unless-stopped
+    ports:
+      - "${FRONTEND_PORT:-5173}:5173"
+    environment:
+      VITE_APP_API_URL: ${VITE_APP_API_URL:-http://localhost:3001}
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    depends_on:
+      backend:
+        condition: service_started
+    networks:
+      - sqlify-network
+
+volumes:
+  mysql_data:
+    name: sqlify-mysql-data
+
+networks:
+  sqlify-network:
+    name: sqlify-network
+    driver: bridge
