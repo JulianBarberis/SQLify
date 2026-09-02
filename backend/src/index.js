@@ -23,6 +23,17 @@ app.use(cors({
     if (/^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) {
       return callback(null, true)
     }
+    try {
+      const parsedUrl = new URL(origin)
+      if (parsedUrl.hostname.endsWith('.vercel.app')) {
+        return callback(null, true)
+      }
+    } catch {
+      // Ignorar URLs inválidas
+    }
+    if (process.env.FRONTEND_URL && origin === process.env.FRONTEND_URL) {
+      return callback(null, true)
+    }
     if (allowedOrigins.includes(origin)) {
       return callback(null, true)
     }
