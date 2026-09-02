@@ -26,10 +26,12 @@ export const ResultTable = React.memo(function ResultTable({ executed }: Props) 
     }));
   }, [rows]);
 
-  const columnAlignments = useMemo<Record<string, 'col-left' | 'col-right' | 'col-center'>>(() => {
-    const aligns: Record<string, 'col-left' | 'col-right' | 'col-center'> = {};
+  const columnAlignments = useMemo<Record<string, string>>(() => {
+    const aligns: Record<string, string> = {};
     for (const header of orderedHeaders) {
-      if (header.key === '#' || haveUrl(header.key)) {
+      if (header.key === '#') {
+        aligns[header.key] = 'col-center col-index';
+      } else if (haveUrl(header.key)) {
         aligns[header.key] = 'col-center';
       } else {
         const sample = rows.find(r => r[header.key] !== null && r[header.key] !== undefined)?.[header.key];
