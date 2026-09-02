@@ -74,5 +74,25 @@ describe('validateConsulta middleware', () => {
 
     validateConsulta(req2, res2, next2)
     expect(res2.status).toHaveBeenCalledWith(400)
+
+    const req3 = { body: { question: 'test', run: true, limit: 101 } }
+    const res3 = mockRes()
+    const next3 = jest.fn()
+
+    validateConsulta(req3, res3, next3)
+    expect(res3.status).toHaveBeenCalledWith(400)
+    expect(res3.json).toHaveBeenCalledWith({ error: 'limit debe ser un number válido (1 - 100)' })
+  })
+
+  it('returns 400 if question exceeds 500 characters', () => {
+    const longQuestion = 'a'.repeat(501)
+    const req = { body: { question: longQuestion, run: false } }
+    const res = mockRes()
+    const next = jest.fn()
+
+    validateConsulta(req, res, next)
+    expect(next).not.toHaveBeenCalled()
+    expect(res.status).toHaveBeenCalledWith(400)
+    expect(res.json).toHaveBeenCalledWith({ error: 'question excede el límite permitido (máximo 500 caracteres)' })
   })
 })

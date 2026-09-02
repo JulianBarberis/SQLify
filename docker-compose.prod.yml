@@ -20,7 +20,7 @@ services:
       args:
         VITE_APP_API_URL: ${VITE_APP_API_URL:-http://localhost:3001}
     restart: always
-    ports:
+    ports: !override
       - "${PROD_HTTP_PORT:-80}:80"
     volumes: []
     deploy:
@@ -31,6 +31,7 @@ services:
 
   db:
     restart: always
+    ports: !override [] # Elimina los puertos publicados heredados del compose base
     deploy:
       resources:
         limits:

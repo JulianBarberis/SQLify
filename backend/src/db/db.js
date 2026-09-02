@@ -7,19 +7,23 @@ let pool = null
 
 export async function initPool() {
   if (!pool) {
+    const dbName = process.env.DB_NAME || ''
     pool = mysql.createPool({
       host: process.env.DB_HOST || '127.0.0.1',
       port: Number(process.env.DB_PORT || 3306),
       user: process.env.DB_USER || 'root',
       password: process.env.DB_PASS || '',
-      database: process.env.DB_NAME || '',
+      database: dbName,
       waitForConnections: true,
       connectionLimit: 10,
     })
 
-    const conn = await pool.getConnection()
-    await conn.query(`USE ${process.env.DB_NAME}`)
-    conn.release()
+    if (dbName) {
+      const conn = await pool.getConnection()
+      const sanitizedDbName = dbName.replace(/[`\\]/g, '')
+      await conn.query(`USE \`${sanitizedDbName}\``)
+      conn.release()
+    }
   }
 
   return pool

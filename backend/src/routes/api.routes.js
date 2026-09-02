@@ -6,6 +6,20 @@ import { validateConsulta } from '../middlewares/validateConsulta.js'
 
 const apiRouter = Router()
 
+// Límite general para proteger todos los endpoints de la API contra saturación
+const generalApiLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 100,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    error: 'demasiadas-peticiones',
+    detail: 'Has superado el límite general de peticiones por minuto. Por favor, espera un momento antes de volver a intentar.'
+  }
+})
+
+apiRouter.use(generalApiLimiter)
+
 const consultaRateLimiter = rateLimit({
   windowMs: 60 * 1000, // 1 minuto
   max: 30, // máximo 30 peticiones por minuto por IP

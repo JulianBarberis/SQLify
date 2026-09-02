@@ -209,5 +209,23 @@ describe('consultaController', () => {
       detail: 'Error primitivo como string',
       sql: 'SELECT * FROM usuarios;'
     })
+
+    // Prueba de anonimización en producción
+    const origEnv = process.env.NODE_ENV
+    process.env.NODE_ENV = 'production'
+    const res3 = mockRes()
+    validarCampos.mockReturnValueOnce()
+    consultarGemini.mockResolvedValueOnce('SELECT * FROM usuarios;')
+    normalizeGeneratedSql.mockReturnValueOnce('SELECT * FROM usuarios;')
+    query.mockRejectedValueOnce(new Error('Internal DB failure password=123'))
+
+    await consultaController(req, res3)
+    expect(res3.status).toHaveBeenCalledWith(500)
+    expect(res3.json).toHaveBeenCalledWith({
+      error: 'generar-consulta-failed',
+      detail: 'Ocurrió un error inesperado al procesar la consulta.',
+      sql: 'SELECT * FROM usuarios;'
+    })
+    process.env.NODE_ENV = origEnv
   })
 })

@@ -35,11 +35,12 @@
   "dependencies": {
     "@faker-js/faker": "^10.1.0",
     "@google/generative-ai": "^0.24.1",
-    "axios": "^1.12.2",
+    "axios": "^1.20.0",
     "cors": "^2.8.5",
     "dotenv": "^17.2.1",
     "express": "^5.1.0",
     "express-rate-limit": "^8.7.0",
+    "helmet": "^8.3.0",
     "mysql2": "^3.15.3",
     "node-sql-parser": "^5.4.0"
   },

@@ -14,7 +14,7 @@ describe('ResultTable Component', () => {
     expect(screen.getByRole('region', { name: /sin resultados de búsqueda/i })).toBeInTheDocument();
   });
 
-  it('renderiza tabla con datos, links de url con valores reales y nulos', () => {
+  it('renderiza tabla con links seguros y previene inyección XSS de protocolos inseguros (javascript:)', () => {
     const rows = [
       {
         ID_Cancion: 'cancion_1',
@@ -28,7 +28,7 @@ describe('ResultTable Component', () => {
         id: 2,
         titulo: 'Save Your Tears',
         reproducciones: 800000,
-        spotify_url: 'https://open.spotify.com/track/456',
+        spotify_url: 'http://open.spotify.com/track/456',
         detalles_json: { genero: 'Pop' },
         observaciones: undefined,
       },
@@ -36,9 +36,25 @@ describe('ResultTable Component', () => {
         id: 3,
         titulo: 'In Your Eyes',
         reproducciones: 500000,
-        spotify_url: null, // cubre la rama cell ?? '' cuando cell es nulo/undefined en columna url
+        spotify_url: 'spotify:track:789',
         detalles_json: null,
         observaciones: 'Ok',
+      },
+      {
+        id: 4,
+        titulo: 'Malicious Track',
+        reproducciones: 100,
+        spotify_url: 'javascript:alert("XSS")', // Ataque bloqueado: no debe generar enlace <a>
+        detalles_json: null,
+        observaciones: null,
+      },
+      {
+        id: 5,
+        titulo: 'Track Sin Link',
+        reproducciones: 200,
+        spotify_url: null,
+        detalles_json: null,
+        observaciones: null,
       },
     ];
 
@@ -48,12 +64,18 @@ describe('ResultTable Component', () => {
     expect(screen.getByText('Blinding Lights')).toBeInTheDocument();
     expect(screen.getByText('Save Your Tears')).toBeInTheDocument();
     expect(screen.getByText('In Your Eyes')).toBeInTheDocument();
+    expect(screen.getByText('Malicious Track')).toBeInTheDocument();
 
+    // Solo los 3 enlaces seguros deben renderizarse con botón de reproducción
     const playButtons = container.querySelectorAll('a.play-button');
     expect(playButtons).toHaveLength(3);
     expect(playButtons[0]).toHaveAttribute('href', 'https://open.spotify.com/track/123');
-    expect(playButtons[1]).toHaveAttribute('href', 'https://open.spotify.com/track/456');
-    expect(playButtons[2]).toHaveAttribute('href', '');
+    expect(playButtons[0]).toHaveAttribute('rel', 'noopener noreferrer');
+    expect(playButtons[1]).toHaveAttribute('href', 'http://open.spotify.com/track/456');
+    expect(playButtons[2]).toHaveAttribute('href', 'spotify:track:789');
+
+    // El payload malicioso se renderiza como texto plano escapado, no como enlace interactivo
+    expect(screen.getByText('javascript:alert("XSS")')).toBeInTheDocument();
   });
 
   it('renderiza claves alternativas (ID_Artista, ID_Usuario, row-index) y tipos primitivos en celdas', () => {

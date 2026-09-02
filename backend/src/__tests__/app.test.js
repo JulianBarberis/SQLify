@@ -107,6 +107,17 @@ describe('Express App & API Routes (src/app.js & src/routes/api.routes.js)', () 
       expect(res.body.detail).toBe('Origen https://sitio-malicioso.com no permitido por CORS')
     })
 
+    it('rechaza subdominios de vercel no pertenecientes a SQLify', async () => {
+      const res = await request(app).get('/').set('Origin', 'https://malicious-app.vercel.app')
+      expect(res.status).toBe(500)
+      expect(res.body.detail).toContain('no permitido por CORS')
+    })
+
+    it('elimina el header x-powered-by por seguridad con helmet', async () => {
+      const res = await request(app).get('/')
+      expect(res.headers['x-powered-by']).toBeUndefined()
+    })
+
     it('maneja strings de origen inválidos sin arrojar excepción no controlada', async () => {
       const res = await request(app).get('/').set('Origin', 'not-a-valid-url')
       expect(res.status).toBe(500)
