@@ -50,7 +50,7 @@ describe('db (db/db.js)', () => {
       })
     )
     expect(mockPool.getConnection).toHaveBeenCalled()
-    expect(mockConn.query).toHaveBeenCalledWith('USE sqlify_test')
+    expect(mockConn.query).toHaveBeenCalledWith('USE `sqlify_test`')
     expect(mockConn.release).toHaveBeenCalled()
     expect(pool).toBe(mockPool)
   })

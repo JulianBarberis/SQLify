@@ -1,9 +1,17 @@
 import express from 'express'
 import cors from 'cors'
+import helmet from 'helmet'
 import apiRouter from './routes/api.routes.js'
 import { errorHandler } from './middlewares/errorHandler.js'
 
 const app = express()
+
+// Cabeceras de seguridad HTTP básicas y eliminación de fingerprinting
+app.use(helmet({
+  contentSecurityPolicy: false,
+  crossOriginResourcePolicy: { policy: 'cross-origin' }
+}))
+app.disable('x-powered-by')
 
 const allowedOrigins = [
   'http://localhost:5173',
@@ -14,6 +22,9 @@ const allowedOrigins = [
   'http://158.69.212.87:3000'
 ]
 
+// Patrón seguro para subdominios Vercel pertenecientes exclusivamente al proyecto SQLify
+const sqlifyVercelPattern = /^https:\/\/(sqlify|sqlify-[a-z0-9-]+)\.vercel\.app$/
+
 app.use(cors({
   origin: (origin, callback) => {
     if (!origin) return callback(null, true)
@@ -22,7 +33,7 @@ app.use(cors({
     }
     try {
       const parsedUrl = new URL(origin)
-      if (parsedUrl.hostname.endsWith('.vercel.app')) {
+      if (sqlifyVercelPattern.test(parsedUrl.origin)) {
         return callback(null, true)
       }
     } catch {
@@ -42,7 +53,7 @@ app.use(cors({
   maxAge: 3600
 }))
 
-app.use(express.json())
+app.use(express.json({ limit: '10kb' }))
 
 // Rutas de la API bajo /api
 app.use('/api', apiRouter)

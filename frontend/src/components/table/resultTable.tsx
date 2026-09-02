@@ -8,6 +8,12 @@ type Props = { executed: ExecuteModel };
 
 const haveUrl = (label: string): boolean => label.toLowerCase().includes('url');
 
+const isSafeUrl = (url: unknown): boolean => {
+  if (typeof url !== 'string') return false;
+  const trimmed = url.trim().toLowerCase();
+  return trimmed.startsWith('https://') || trimmed.startsWith('http://') || trimmed.startsWith('spotify:');
+};
+
 export const ResultTable = React.memo(function ResultTable({ executed }: Props) {
   const rows = useMemo(() => {
     return (executed?.rows as Array<Record<string, unknown>>) ?? [];
@@ -73,12 +79,12 @@ export const ResultTable = React.memo(function ResultTable({ executed }: Props) 
 
                   return (
                     <td key={header.key} className={`data ${alignClass}`}>
-                      {header.key !== '#' && haveUrl(header.key) ? (
+                      {header.key !== '#' && haveUrl(header.key) && isSafeUrl(cell) ? (
                         <div className="data play-container">
                           <a
-                            href={String(cell ?? '')}
+                            href={String(cell)}
                             target="_blank"
-                            rel="noreferrer"
+                            rel="noopener noreferrer"
                             className="play-button"
                             aria-label={`Reproducir pista ${i + 1} (abre en nueva pestaña)`}
                           >

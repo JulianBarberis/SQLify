@@ -56,9 +56,12 @@ export const consultaController = async (req, res) => {
     }
 
     // Fallback: error general
+    const isProd = process.env.NODE_ENV === 'production'
     return res.status(500).json({
       error: 'generar-consulta-failed',
-      detail: String(e.message || e),
+      detail: isProd
+        ? 'Ocurrió un error inesperado al procesar la consulta.'
+        : String(e.message || e),
       sql: cleanSql
     })
   }
