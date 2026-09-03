@@ -1,0 +1,83 @@
+.empty-state-card {
+  width: 100%;
+  max-width: 860px;
+  background-color: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--card-radius);
+  padding: var(--primitive-space-8) var(--primitive-space-6);
+  margin-top: var(--primitive-space-4);
+  text-align: center;
+  box-shadow: var(--card-shadow);
+}
+
+.empty-state-icon-container {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  border-radius: var(--primitive-radius-full);
+  background-color: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--color-border-subtle);
+  color: var(--color-text-muted);
+  margin-bottom: var(--primitive-space-4);
+}
+
+.empty-state-title {
+  font-size: var(--primitive-font-xl);
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin-bottom: var(--primitive-space-2);
+}
+
+.empty-state-description {
+  color: var(--color-text-secondary);
+  font-size: var(--primitive-font-base);
+  max-width: 520px;
+  margin: 0 auto var(--primitive-space-6) auto;
+  line-height: 1.5;
+}
+
+.empty-state-tips {
+  background-color: var(--color-bg-surface-elevated);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--primitive-radius-lg);
+  padding: var(--primitive-space-4) var(--primitive-space-5);
+  max-width: 500px;
+  margin: 0 auto;
+  text-align: left;
+}
+
+.empty-state-tips-heading {
+  font-size: var(--primitive-font-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-primary);
+  margin-bottom: var(--primitive-space-2);
+  display: flex;
+  align-items: center;
+  gap: var(--primitive-space-2);
+}
+
+.empty-state-tips ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.empty-state-tips li {
+  font-size: var(--primitive-font-sm);
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+  position: relative;
+  padding-left: 1.25rem;
+  margin-bottom: var(--primitive-space-1);
+}
+
+.empty-state-tips li::before {
+  content: '•';
+  position: absolute;
+  left: 0.35rem;
+  color: var(--color-primary);
+}

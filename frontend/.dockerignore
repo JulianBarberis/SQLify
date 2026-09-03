@@ -1,0 +1,14 @@
+node_modules
+dist
+pnpm-debug.log*
+npm-debug.log*
+yarn-error.log*
+.pnpm-store
+.env
+.env.*
+!.env.example
+.git
+.gitignore
+*.md
+.DS_Store
+Thumbs.db

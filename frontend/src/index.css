@@ -1,0 +1,14 @@
+@import './styles/tokens.css';
+
+body {
+  margin: 0;
+  font-family: var(--primitive-font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--color-bg-canvas);
+  color: var(--color-text-primary);
+}
+
+code {
+  font-family: var(--primitive-font-mono);
+}
