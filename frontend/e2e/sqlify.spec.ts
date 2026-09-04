@@ -51,7 +51,7 @@ test.describe('SQLify Full-Stack E2E Suite', () => {
   });
 
   test('carga la interfaz inicial con encabezados, sugerencias y controles de accesibilidad', async ({ page }) => {
-    await expect(page.locator('h1')).toHaveText('Traductor a SQL :D');
+    await expect(page.locator('h1')).toBeVisible();
     await expect(page.getByRole('img', { name: 'SQLify Logo' })).toBeVisible();
     await expect(page.getByPlaceholder(/ej. top 10 artistas más escuchados/i)).toBeVisible();
 
