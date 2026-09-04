@@ -82,17 +82,28 @@ describe('Express App & API Routes (src/app.js & src/routes/api.routes.js)', () 
       expect(res2.headers['access-control-allow-origin']).toBe('http://127.0.0.1:8080')
     })
 
-    it('permite subdominios de vercel.app', async () => {
-      const res = await request(app).get('/').set('Origin', 'https://sqlify-client.vercel.app')
-      expect(res.status).toBe(200)
-      expect(res.headers['access-control-allow-origin']).toBe('https://sqlify-client.vercel.app')
+    it('permite subdominios de vercel.app pertenecientes a SQLify (sqlify y sq-lify)', async () => {
+      const res1 = await request(app).get('/').set('Origin', 'https://sqlify-client.vercel.app')
+      expect(res1.status).toBe(200)
+      expect(res1.headers['access-control-allow-origin']).toBe('https://sqlify-client.vercel.app')
+
+      const res2 = await request(app).get('/').set('Origin', 'https://sq-lify-sandy.vercel.app')
+      expect(res2.status).toBe(200)
+      expect(res2.headers['access-control-allow-origin']).toBe('https://sq-lify-sandy.vercel.app')
     })
 
-    it('permite FRONTEND_URL configurada en variables de entorno', async () => {
-      process.env.FRONTEND_URL = 'https://mi-dominio-sqlify.com'
+    it('permite FRONTEND_URL configurada en variables de entorno (con o sin trailing slash)', async () => {
+      process.env.FRONTEND_URL = 'https://mi-dominio-sqlify.com/'
       const res = await request(app).get('/').set('Origin', 'https://mi-dominio-sqlify.com')
       expect(res.status).toBe(200)
       expect(res.headers['access-control-allow-origin']).toBe('https://mi-dominio-sqlify.com')
+    })
+
+    it('rechaza origen no coincidente cuando FRONTEND_URL está configurada', async () => {
+      process.env.FRONTEND_URL = 'https://mi-dominio-sqlify.com'
+      const res = await request(app).get('/').set('Origin', 'https://otro-dominio-no-permitido.com')
+      expect(res.status).toBe(500)
+      expect(res.body.detail).toContain('no permitido por CORS')
     })
 
     it('permite IPs de la lista permitida fija', async () => {
