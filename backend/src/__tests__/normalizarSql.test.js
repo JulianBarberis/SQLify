@@ -13,13 +13,13 @@ describe('normalizarSql with AST Parser', () => {
   it('permite consultas SELECT válidas que consultan tablas del dominio', () => {
     const raw = '```sql SELECT id_cancion, titulo, duracion FROM Cancion WHERE duracion > 200 LIMIT 10; ```'
     const clean = normalizeGeneratedSql(raw)
-    expect(clean).toBe('SELECT id_cancion, titulo, duracion FROM Cancion WHERE duracion > 200 LIMIT 10')
+    expect(clean).toBe('SELECT id_cancion, titulo, duracion FROM cancion WHERE duracion > 200 LIMIT 10')
   })
 
   it('permite consultas con palabras como "drop" dentro de cadenas de texto literales', () => {
     const raw = "SELECT * FROM Cancion WHERE titulo LIKE '%drop%' LIMIT 5;"
     const clean = normalizeGeneratedSql(raw)
-    expect(clean).toBe("SELECT * FROM Cancion WHERE titulo LIKE '%drop%' LIMIT 5")
+    expect(clean).toBe("SELECT * FROM cancion WHERE titulo LIKE '%drop%' LIMIT 5")
   })
 
   it('limpia comentarios de línea y de bloque adecuadamente', () => {
@@ -29,19 +29,19 @@ describe('normalizarSql with AST Parser', () => {
       SELECT * FROM Artista;
     `
     const clean = normalizeGeneratedSql(raw)
-    expect(clean).toBe('SELECT * FROM Artista')
+    expect(clean).toBe('SELECT * FROM artista')
   })
 
   it('auto-corrige cláusulas LIMIT colgantes sin número', () => {
     const raw = 'SELECT * FROM Cancion LIMIT'
     const clean = normalizeGeneratedSql(raw)
-    expect(clean).toBe('SELECT * FROM Cancion LIMIT 100')
+    expect(clean).toBe('SELECT * FROM cancion LIMIT 100')
   })
 
   it('bloquea sentencias DDL (DROP TABLE, ALTER TABLE)', () => {
     expect(normalizeGeneratedSql('DROP TABLE Cancion;')).toBeNull()
     expect(normalizeGeneratedSql('ALTER TABLE Usuario ADD COLUMN test INT;')).toBeNull()
-    expect(normalizeGeneratedSql('SELECT * FROM Cancion; DROP TABLE Usuario;')).toBe('SELECT * FROM Cancion')
+    expect(normalizeGeneratedSql('SELECT * FROM Cancion; DROP TABLE Usuario;')).toBe('SELECT * FROM cancion')
   })
 
   it('bloquea sentencias DML que no son SELECT (INSERT, UPDATE, DELETE)', () => {
@@ -92,7 +92,7 @@ describe('normalizarSql fallback and edge cases', () => {
     }
 
     const clean1 = normalizeGeneratedSql('SELECT * FROM Artista')
-    expect(clean1).toBe('SELECT * FROM Artista')
+    expect(clean1).toBe('SELECT * FROM artista')
 
     pkg.Parser.prototype.astify = function (sql, opt) {
       if (opt?.database === 'mariadb') {
@@ -102,7 +102,7 @@ describe('normalizarSql fallback and edge cases', () => {
     }
 
     const clean2 = normalizeGeneratedSql('SELECT * FROM Cancion')
-    expect(clean2).toBe('SELECT * FROM Cancion')
+    expect(clean2).toBe('SELECT * FROM cancion')
 
     pkg.Parser.prototype.tableList = origTableList
     pkg.Parser.prototype.astify = origAstify

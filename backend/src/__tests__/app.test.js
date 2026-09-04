@@ -62,7 +62,7 @@ describe('Express App & API Routes (src/app.js & src/routes/api.routes.js)', () 
       .send({ question: 'dame 10 artistas', run: true, limit: 10 })
 
     expect(res.status).toBe(200)
-    expect(res.body.sql).toBe('SELECT * FROM Artista LIMIT 10')
+    expect(res.body.sql).toBe('SELECT * FROM artista LIMIT 10')
     expect(res.body.executed.rowCount).toBe(1)
   })
 

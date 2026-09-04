@@ -88,10 +88,10 @@ function App() {
       </div>
 
       <div className="container">
-        <h1>Traductor a SQL :D</h1>
+        <h1>Consultas a Spotify de lenguaje natural a SQL</h1>
 
         <div>
-          <p>Te ayudamos con la Base de Datos generando las consultas a partir de un lenguaje natural mediante una IA</p>
+          <p>Objenemos info de Spotify generando las consultas SQL a partir de un lenguaje natural mediante una IA</p>
 
           <form className="form-conatainer" onSubmit={handleSubmit}>
             <div className="info-container">

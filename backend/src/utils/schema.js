@@ -1,5 +1,5 @@
 const demoDDL = `
-  TABLE Artista (
+  TABLE artista (
     ID_Artista varchar(50) NOT NULL,
     nombre varchar(150),
     genero varchar(50),
@@ -8,7 +8,7 @@ const demoDDL = `
     url varchar(255)
   )
 
-  TABLE Album (
+  TABLE album (
     ID_Album varchar(50) NOT NULL,
     titulo varchar(200),
     ano year,
@@ -17,7 +17,7 @@ const demoDDL = `
     url varchar(255)
   )
 
-  TABLE Cancion (
+  TABLE cancion (
     ID_Cancion varchar(50) NOT NULL,
     ID_Album varchar(50),
     titulo varchar(200),
@@ -26,31 +26,31 @@ const demoDDL = `
     popularidad int
   )
 
-  TABLE Cancion_artista (
+  TABLE cancion_artista (
     ID_Cancion varchar(50),
     ID_Artista varchar(50)
   )
 
-  TABLE Album_artista (
+  TABLE album_artista (
     ID_Album varchar(50),
     ID_Artista varchar(50)
   )
 
-  TABLE Playlist (
+  TABLE playlist (
     ID_Playlist int NOT NULL,
     ID_Usuario int,
     titulo varchar(200),
     fecha_creacion date
   )
 
-  TABLE Playlist_cancion (
+  TABLE playlist_cancion (
     ID_Playlist int,
     ID_Cancion varchar(50),
     fecha_agregada timestamp,
     orden int
   )
 
-  TABLE Reproduccion (
+  TABLE reproduccion (
     ID_Repro int NOT NULL,
     ID_Usuario int,
     ID_Cancion varchar(50),
@@ -59,7 +59,7 @@ const demoDDL = `
     duracion int
   )
 
-  TABLE Usuario (
+  TABLE usuario (
     ID_Usuario int NOT NULL,
     nombre varchar(150),
     email varchar(150),

@@ -26,7 +26,7 @@ describe('App Component Integration', () => {
   it('renderiza estructura básica y maneja interacción del tooltip de información', async () => {
     const { unmount } = render(<App />);
 
-    expect(screen.getByRole('heading', { name: /traductor a sql/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument();
     expect(screen.getByPlaceholderText(/ej. top 10 artistas más escuchados/i)).toBeInTheDocument();
 
     const infoBtn = screen.getByRole('button', { name: /información adicional sobre consultas/i });

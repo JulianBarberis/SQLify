@@ -88,6 +88,22 @@ export function normalizeGeneratedSql(raw) {
       }
     }
 
+    // Normalizar nombres de tablas a minúsculas exactas para compatibilidad con sistemas de archivos Linux (MySQL case-sensitivity)
+    const orderedTables = [
+      'cancion_artista',
+      'album_artista',
+      'playlist_cancion',
+      'reproduccion',
+      'playlist',
+      'cancion',
+      'artista',
+      'album',
+      'usuario'
+    ]
+    for (const tbl of orderedTables) {
+      clean = clean.replace(new RegExp(`\\b${tbl}\\b`, 'gi'), tbl)
+    }
+
     return clean
   } catch {
     // Si la consulta no es válida según la gramática SQL
