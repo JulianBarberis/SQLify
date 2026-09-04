@@ -1,10 +1,24 @@
 import dotenv from 'dotenv'
 import app from './app.js'
 import { initPool, closePool } from './db/db.js'
+import { seedDatabase } from './db/scripts/seed.js'
 
 dotenv.config()
 
-initPool().catch(err => console.warn('Aviso: Base de datos no conectada al inicio:', err.message || err))
+initPool()
+  .then(async (pool) => {
+    try {
+      const conn = await pool.getConnection()
+      try {
+        await seedDatabase(conn)
+      } finally {
+        conn.release()
+      }
+    } catch (seedErr) {
+      console.warn('Aviso: Auto-seeding no completado al inicio:', seedErr.message || seedErr)
+    }
+  })
+  .catch(err => console.warn('Aviso: Base de datos no conectada al inicio:', err.message || err))
 const PORT = process.env.PORT || 3001
 
 /* Puerto utilizado por el servidor en consola */
