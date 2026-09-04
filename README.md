@@ -2,7 +2,6 @@
 
   <img src="./frontend/src/assets/logo-completo.png" alt="SQLify Logo" width="380" />
 
-  # SQLify
   ### *Traductor Inteligente de Lenguaje Natural a Consultas SQL para Catálogo Musical*
 
   [![CI Pipeline](https://img.shields.io/badge/CI-Passing-brightgreen?style=flat-square&logo=githubactions&logoColor=white)](https://github.com/JulianBarberis/SQLify/actions/workflows/ci.yml)
@@ -22,12 +21,6 @@
     </a>
     <a href="https://sqlify-production-44bf.up.railway.app/api" target="_blank">
       <img src="https://img.shields.io/badge/⚡_API-Healthcheck_&_Status-007ACC?style=for-the-badge&logo=fastapi&logoColor=white" alt="API Healthcheck" />
-    </a>
-    <a href="https://www.canva.com/design/DAG4DoByMzI/3HBdtNNOGrPtjUhFCQqehA/edit" target="_blank">
-      <img src="https://img.shields.io/badge/📊_Slides-Presentación_Oficial-7D2AE8?style=for-the-badge&logo=canva&logoColor=white" alt="Presentación Canva" />
-    </a>
-    <a href="https://docs.google.com/document/d/1xCTAz2p39cdZCyoZAtHQ-RzSXuyHwVRB9p9WoXEulsA/edit?tab=t.0#heading=h.lkn6otcsxfke" target="_blank">
-      <img src="https://img.shields.io/badge/📑_Docs-Especificación_Técnica-4285F4?style=for-the-badge&logo=googledocs&logoColor=white" alt="Google Docs" />
     </a>
   </p>
 
