@@ -21,7 +21,8 @@ export async function consultarGemini({ question, schemaDDL, limit }) {
     Reglas IMPORTANTES:
     - Devuelve SOLO una sentencia SELECT válida (una sola línea).
     - Prohibido usar INSERT, UPDATE, DELETE, DROP, ALTER o transacciones.
-    - Usa nombres de tablas y columnas EXACTOS del esquema provisto.
+    - Usa nombres de tablas y columnas EXACTOS del esquema provisto, SIEMPRE en minúsculas (cancion, artista, album, reproduccion, usuario, playlist, cancion_artista, album_artista, playlist_cancion).
+    - Para consultas sobre canciones más reproducidas, populares o escuchadas, prioriza ordenar por la columna popularidad de la tabla cancion (ej: ORDER BY c.popularidad DESC).
     - Si la consulta no especifica límite, añade LIMIT ${limit}.
     - Evita CTEs (WITH) y funciones avanzadas que no sean compatibles con MariaDB.
     - PRIORIDAD: No usar LIMIT dentro de subconsultas que utilicen IN/ALL/ANY/SOME.
