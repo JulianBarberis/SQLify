@@ -22,8 +22,8 @@ const allowedOrigins = [
   'http://158.69.212.87:3000'
 ]
 
-// Patrón seguro para subdominios Vercel pertenecientes exclusivamente al proyecto SQLify
-const sqlifyVercelPattern = /^https:\/\/(sqlify|sqlify-[a-z0-9-]+)\.vercel\.app$/
+// Patrón seguro para subdominios Vercel pertenecientes exclusivamente al proyecto SQLify (ej: sqlify-*, sq-lify-*)
+const sqlifyVercelPattern = /^https:\/\/(sqlify|sq-lify)(-[a-z0-9-]+)?\.vercel\.app$/
 
 app.use(cors({
   origin: (origin, callback) => {
@@ -39,8 +39,11 @@ app.use(cors({
     } catch {
       // Ignorar URLs inválidas
     }
-    if (process.env.FRONTEND_URL && origin === process.env.FRONTEND_URL) {
-      return callback(null, true)
+    if (process.env.FRONTEND_URL) {
+      const configuredOrigins = process.env.FRONTEND_URL.split(',').map(o => o.trim().replace(/\/+$/, ''))
+      if (configuredOrigins.includes(origin.replace(/\/+$/, ''))) {
+        return callback(null, true)
+      }
     }
     if (allowedOrigins.includes(origin)) {
       return callback(null, true)
